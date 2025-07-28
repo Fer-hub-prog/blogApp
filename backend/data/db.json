@@ -1,0 +1,18 @@
+{
+  "posts": [
+    {
+      "id": 1,
+      "title": "Primeiro Post",
+      "author": "professor",
+      "description": "Este é o primeiro post.",
+      "content": "Conteúdo completo do post 1."
+    },
+    {
+      "id": 2,
+      "title": "Teste 1",
+      "author": "Prof. Ana",
+      "description": "Resumo do teste 1",
+      "content": "Vamos testar o título 1"
+    }
+  ]
+}
