@@ -1,7 +1,7 @@
 // server.js
 const jsonServer = require('json-server');
 const server = jsonServer.create();
-const router = jsonServer.router('data/db.json'); // ajuste o path se necessário
+const router = jsonServer.router('backend/data/db.json'); // ajuste o path se necessário
 const middlewares = jsonServer.defaults();
 const bodyParser = require('body-parser');
 

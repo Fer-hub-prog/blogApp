@@ -2,17 +2,70 @@
   "posts": [
     {
       "id": 1,
-      "title": "Primeiro Post",
-      "author": "professor",
-      "description": "Este é o primeiro post.",
-      "content": "Conteúdo completo do post 1."
+      "titulo": "Boas-vindas ao curso!",
+      "description": "Introdução ao nosso ambiente de aprendizagem.",
+      "conteudo": "Estamos muito felizes em receber você em nossa plataforma. Este post contém tudo o que você precisa para começar!",
+      "author": "Prof. João Silva"
     },
     {
       "id": 2,
-      "title": "Teste 1",
-      "author": "Prof. Ana",
-      "description": "Resumo do teste 1",
-      "content": "Vamos testar o título 1"
+      "titulo": "Primeira atividade",
+      "description": "Entregue até sexta-feira",
+      "conteudo": "Leia o capítulo 1 do material de apoio e responda às questões no fórum.",
+      "author": "Profª. Maria Souza"
+    },
+    {
+      "id": 3,
+      "titulo": "Aviso importante",
+      "description": "Mudança no cronograma",
+      "conteudo": "Informamos que o calendário da disciplina foi ajustado. Confira os novos prazos no ambiente virtual.",
+      "author": "Prof. Carlos Lima"
+    },
+    {
+      "titulo": "Teste 1",
+      "conteudo": "dwdwdwdwdsadsadsadsadsadsadsadsadsdsadsdsdsdsdsdsdsadsad",
+      "descricao": "Teste de post novo",
+      "author": "aluno",
+      "data": "2025-07-29T23:07:40.365Z",
+      "id": 4
+    }
+  ],
+  "professores": [
+    {
+      "id": 1,
+      "nome": "João Silva",
+      "email": "joao@escola.com",
+      "senha": "123456"
+    },
+    {
+      "id": 2,
+      "nome": "Maria Souza",
+      "email": "maria@escola.com",
+      "senha": "123456"
+    }
+  ],
+  "estudantes": [
+    {
+      "id": 1,
+      "nome": "Ana Paula",
+      "email": "ana@aluno.com",
+      "senha": "123456"
+    },
+    {
+      "id": 2,
+      "nome": "Lucas Martins",
+      "email": "lucas@aluno.com",
+      "senha": "123456"
+    },
+    {
+      "nome": "Maniel teste",
+      "email": "maniel@yahoo.com",
+      "id": 3
+    },
+    {
+      "nome": "Manuel 2",
+      "email": "manuel@hotmail.com",
+      "id": 4
     }
   ]
 }

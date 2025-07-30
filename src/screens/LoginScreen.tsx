@@ -1,3 +1,4 @@
+// src/screens/LoginScreen.tsx
 import React, { useState } from 'react';
 import {
   View,
@@ -7,101 +8,99 @@ import {
   StyleSheet,
   Alert,
   Image,
+  ScrollView,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../navigation/AppNavigator';
+import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Tipos da resposta da API
-type Usuario = {
-  username: string;
-  role: 'aluno' | 'professor';
-};
+type NavigationProps = NativeStackNavigationProp<RootStackParamList>;
 
-type LoginResponse = {
-  success: boolean;
-  user: Usuario;
-};
+export default function LoginScreen() {
+  const navigation = useNavigation<NavigationProps>();
+  const { login } = useAuth();
 
-export default function LoginScreen({ navigation }: any) {
   const [username, setUsername] = useState('');
-  const [senha, setSenha] = useState('');
+  const [password, setPassword] = useState('');
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post<LoginResponse>('http://192.168.0.7:3000/login', {
-        username,
-        password: senha,
-      });
+      const res = await axios.post<{ success: boolean; user?: { role: string } }>(
+        'http://10.0.2.2:3000/login',
+        { username, password }
+      );
 
-      if (response.status === 200 && response.data.success) {
-        const { role } = response.data.user;
+      const { success, user } = res.data;
 
-        await AsyncStorage.setItem('usuarioLogado', JSON.stringify(response.data.user));
-
-        Alert.alert('Sucesso', `Bem-vindo, ${username}!`);
-
-        if (role === 'professor') {
-          navigation.replace('PostsProfessor');
-        } else if (role === 'aluno') {
-          navigation.replace('PostsAluno');
-        } else {
-          Alert.alert('Erro', 'Tipo de usuário desconhecido');
-        }
+      if (success && user?.role) {
+        login(user.role === 'professor' ? 'professor' : 'aluno');
+        navigation.navigate(user.role === 'professor' ? 'PostsProfessor' : 'PostsAluno');
+      } else {
+        Alert.alert('Erro', 'Credenciais inválidas');
       }
-    } catch (error: any) {
-      Alert.alert('Erro', error.response?.data?.message || 'Erro no login, tente novamente');
+    } catch (error) {
+      Alert.alert('Erro', 'Falha na conexão com o servidor');
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Seja bem-vindo ao Blog Educação Fiap, desafio #4</Text>
-      <Image
-        source={require('../../assets/coruja.png')}
-        style={styles.logo}
-        resizeMode="contain"
-      />      
-
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.welcome}>Seja bem-vindo ao Desafio 4 FIAP - BlogApp</Text>
+      <Image source={require('../../assets/coruja.png')} style={styles.image} />
       <Text style={styles.title}>Login</Text>
-
       <TextInput
-        style={styles.input}
-        placeholder="Usuário"
+        placeholder="Usuário (email)"
         value={username}
         onChangeText={setUsername}
-        autoCapitalize="none"
-      />
-
-      <TextInput
         style={styles.input}
-        placeholder="Senha"
-        value={senha}
-        onChangeText={setSenha}
-        secureTextEntry
       />
-
+      <TextInput
+        placeholder="Senha"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+        style={styles.input}
+      />
       <Button title="Entrar" onPress={handleLogin} />
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, justifyContent: 'center', alignItems: 'center' },
-  logo: { width: 120, height: 120, marginBottom: 20 },
-  subtext: {
-    fontSize: 16,
-    color: '#444',
-    textAlign: 'center',
-    marginBottom: 12,
+  container: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    padding: 20,
+    backgroundColor: '#f2f2f2',
   },
-  title: { fontSize: 24, textAlign: 'center', marginBottom: 16 },
+  welcome: {
+    fontSize: 18,
+    fontWeight: '600',
+    textAlign: 'center',
+    marginBottom: 16,
+    color: '#333',
+  },
+  image: {
+    width: 120,
+    height: 120,
+    alignSelf: 'center',
+    marginBottom: 24,
+    resizeMode: 'contain',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
   input: {
     borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 12,
+    borderColor: '#aaa',
+    borderRadius: 8,
+    padding: 10,
     marginBottom: 12,
-    borderRadius: 6,
     backgroundColor: '#fff',
-    width: '100%',
   },
 });

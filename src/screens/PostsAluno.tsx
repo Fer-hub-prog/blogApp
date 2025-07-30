@@ -1,78 +1,88 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
+  TextInput,
   FlatList,
   StyleSheet,
-  TextInput,
+  ActivityIndicator,
   TouchableOpacity,
+  Button
 } from 'react-native';
 import axios from 'axios';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import PostItem from '../components/PostItem';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../navigation/AppNavigator';
 
 type Post = {
   id: number;
-  titulo: string;
-  conteudo: string;
-  data?: string;
+  titulo?: string;
+  description?: string;
+  conteudo?: string;
   author?: string;
 };
 
-export default function PostsAluno({ navigation }: any) {
+export default function PostsAluno() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [busca, setBusca] = useState('');
   const [postsFiltrados, setPostsFiltrados] = useState<Post[]>([]);
+  const [carregando, setCarregando] = useState(true);
+
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   useEffect(() => {
-   axios.get<Post[]>('http://192.168.0.7:3000/posts')
-  .then((res) => {
-    setPosts(res.data);
-    setPostsFiltrados(res.data);
-  });
-      }, []); 
+    axios.get<Post[]>('http://10.0.2.2:3000/posts')
+      .then(res => {
+        setPosts(res.data);
+        setPostsFiltrados(res.data);
+        setCarregando(false);
+      })
+      .catch(() => {
+        alert('Erro ao carregar os posts');
+        setCarregando(false);
+      });
+  }, []);
 
   useEffect(() => {
     const texto = busca.toLowerCase();
     const filtrados = posts.filter(p =>
-      p.titulo.toLowerCase().includes(texto) || p.conteudo.toLowerCase().includes(texto)
+      (p.titulo?.toLowerCase() ?? '').includes(texto) ||
+      (p.description?.toLowerCase() ?? '').includes(texto)
     );
     setPostsFiltrados(filtrados);
   }, [busca, posts]);
 
-  const handleLogout = async () => {
-    await AsyncStorage.removeItem('usuarioLogado');
-    navigation.replace('Login');
-  };
+  if (carregando) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#444" />
+        <Text>Carregando posts...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Posts dos Professores</Text>
-        <TouchableOpacity onPress={handleLogout}>
-          <Icon name="logout" size={24} color="#000" />
-        </TouchableOpacity>
-      </View>
-
+      <Button title="Voltar" onPress={() => navigation.goBack()} />
+      <Text style={styles.title}>Bem-vindo, Aluno!</Text>
       <TextInput
-        style={styles.input}
-        placeholder="Buscar post por palavra-chave"
+        placeholder="Buscar por título ou descrição"
         value={busca}
         onChangeText={setBusca}
+        style={styles.input}
       />
 
       <FlatList
         data={postsFiltrados}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={item => item.id.toString()}
         renderItem={({ item }) => (
-          <PostItem
-  title={item.titulo}
-  content={item.conteudo}
-  date={item.data}
-  author={item.author || item.author}
-  onPress={() => navigation.navigate('PostDetalhe', item)}
-/>
+          <TouchableOpacity onPress={() => navigation.navigate('PostDetalhe', { post: item })}>
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>{item.titulo ?? 'Sem título'}</Text>
+              <Text>{item.description ?? 'Sem descrição'}</Text>
+              <Text style={styles.author}>Autor: {item.author ?? 'Desconhecido'}</Text>
+            </View>
+          </TouchableOpacity>
         )}
       />
     </View>
@@ -80,20 +90,25 @@ export default function PostsAluno({ navigation }: any) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, backgroundColor: '#fff' },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  title: { fontSize: 22, fontWeight: 'bold' },
+  container: { flex: 1, padding: 16, paddingTop: 40 },
+  title: { fontSize: 22, fontWeight: 'bold', marginBottom: 16 },
   input: {
-    backgroundColor: '#fff',
     borderWidth: 1,
     borderColor: '#ccc',
     padding: 10,
-    marginBottom: 12,
+    marginBottom: 16,
     borderRadius: 6,
+    backgroundColor: '#fff',
   },
+  card: {
+    borderWidth: 1,
+    borderColor: '#eee',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 12,
+    backgroundColor: '#f9f9f9',
+  },
+  cardTitle: { fontSize: 18, fontWeight: 'bold' },
+  author: { fontStyle: 'italic', color: '#555', marginTop: 5 },
+  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
 });
